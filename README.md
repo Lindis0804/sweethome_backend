@@ -21,19 +21,22 @@ This repo is backend of Sweet Home project. I use Flask - a framework of Python 
 ## System Design
 
 <br/>
-* User usecases:
+
+- User usecases:
 <br/>
 <div align="center">
 <img src="./images/user_usecase.png" style="width:50%">
 </div>
 <br/>
-* Admin usecases:
+
+- Admin usecases:
 <br/>
 <div align="center">
 <img src="./images/admin_usecase.png" style="width:50%">
 </div>
 <br/>
-* Database design:
+
+- Database design:
 <br/>
 <div align="center">
 <img src="./images/database_design.png">
