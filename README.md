@@ -44,3 +44,17 @@ This repo is backend of Sweet Home project. I use Flask - a framework of Python 
 <br/>
 
 ## Implementation
+
+Ensure you have [Python](https://www.python.org/downloads/) (Python 3.10.11 recommended), [Xampp](https://www.apachefriends.org/download.html) (or other Relational Database Management Systems) in your computer and VSCode.
+
+1. Clone or download project:
+
+```bash
+git clone https://github.com/Lindis0804/sweethome_backend
+```
+
+2. Install necessary packages:
+
+```bash
+pip install -r requirements.txt
+```
