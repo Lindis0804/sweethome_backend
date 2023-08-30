@@ -125,7 +125,7 @@ style="width:50%"
 
 5. Config mqtt server infor:
 
-- You can change your mqtt server infor to connect to other mqtt but you can use default mqtt server info to connect to hivemq (a free mqtt server):
+- You can change your mqtt server infor (utils/mqtt.py) to connect to other mqtt but you can use default mqtt server info to connect to hivemq (a free mqtt server):
 <br/>
   <div align="center">
 <img src="./images/mqtt_config.png"
