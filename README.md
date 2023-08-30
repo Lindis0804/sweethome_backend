@@ -142,6 +142,7 @@ style="width:50%"
 python -u main.py
 ```
 
+- Result:
 <br/>
   <div align="center">
 <img src="./images/run_flask_server.png"
