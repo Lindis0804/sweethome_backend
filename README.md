@@ -1,7 +1,7 @@
 # Sweet Home
 
 <div align="center">
-<img src="./images/bedroom.png">
+<img src="./images/bedroom.png" style="width:50%">
 <br/>
 <br/>
 </div>
@@ -36,7 +36,7 @@ This repo is backend of Sweet Home project. I use Flask - a framework of Python 
 * Database design:
 <br/>
 <div align="center">
-<img src="./images/database_design.png" style="width:50%">
+<img src="./images/database_design.png">
 </div>
 <br/>
 
