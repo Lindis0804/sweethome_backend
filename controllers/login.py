@@ -2,6 +2,7 @@ import pymysql
 import hashlib
 from app import *
 from utils.db import mysql
+from utils.db import connectPostgres
 from flask import jsonify
 from flask import request
 
@@ -22,10 +23,10 @@ def login():
         if email != None and password != None and request.method == 'POST':
             # Check if account exists
             hash_pass = hashlib.sha256(password.encode('utf-8')).hexdigest()
-            conn = mysql.connect()
-            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            # conn = mysql.connect()
+            cursor = connectPostgres.cursor(pymysql.cursors.DictCursor)
             cursor.execute(
-                'SELECT * FROM user WHERE email = %s AND password= %s AND role=%s', (email, hash_pass, 0))
+                'SELECT * FROM users WHERE email = %s AND password= %s AND role=%s', (email, hash_pass, 0))
             # Fetch one record and return result
             user = cursor.fetchone()
             if user:
@@ -51,10 +52,11 @@ def loginUser():
         if email != None and password != None and request.method == 'POST':
             # Check if account exists
             hash_pass = hashlib.sha256(password.encode('utf-8')).hexdigest()
-            conn = mysql.connect()
-            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            # conn = mysql.connect()
+            conn = connectPostgres()
+            cursor = conn.cursor()
             cursor.execute(
-                'SELECT * FROM user WHERE email = %s AND password= %s AND role=%s', (email, hash_pass, 1))
+                'SELECT * FROM users WHERE email = %s AND password= %s AND role=%s', (email, hash_pass, 1))
             # Fetch one record and return result
             user = cursor.fetchone()
             if user:

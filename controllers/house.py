@@ -6,7 +6,9 @@ from flask import flash, request
 from datetime import datetime
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_identity
-
+from utils.db import connectPostgres
+from utils.utils import getErrorResponse
+import psycopg2.extras as pe
 # GET /h/houses
 
 
@@ -17,15 +19,20 @@ def getHAllHouses():
     cursor = None
     current_user = get_jwt_identity()
     try:
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT house.id, user.name as username, email, user_id, house.name as name, phone_number, address, created_at, updated_at FROM house, user WHERE house.user_id = user.id AND email=%s", current_user)
+        # conn = mysql.connect()
+        conn = connectPostgres()
+        cursor = conn.cursor(cursor_factory=pe.DictCursor)
+        cursor.execute("SELECT houses.id, users.name as username, email, user_id, houses.name as name, phone_number, address, created_at, updated_at FROM houses, users WHERE houses.user_id = users.id AND email=%s", current_user)
         rows = cursor.fetchall()
-        res = jsonify({"houses": rows})
+        houses = []
+        for row in rows:
+            houses.append(dict(row))
+        res = jsonify({"houses": houses})
         res.status_code = 200
         return res
     except Exception as e:
         print(e)
+        return getErrorResponse(e)
     finally:
         cursor.close()
         conn.close()

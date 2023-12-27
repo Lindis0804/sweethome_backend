@@ -1,12 +1,14 @@
 import pymysql
 from app import *
 from utils.db import mysql
+from utils.db import connectPostgres
 from flask import jsonify
 from flask import flash, request
 from datetime import datetime
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_identity
 
+import psycopg2.extras as pe
 # 1.2 GET room/:room_id/device
 
 
@@ -16,15 +18,24 @@ def getHDeviceOfRoom(room_id):
     conn = None
     cursor = None
     try:
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT device_room.id, device_name, device_detail, code, device_id, room_id, is_active, param, device_room.created_at, device_room.updated_at, name FROM device_room, device WHERE room_id =%s AND device_room.device_id=device.id", room_id)
+        # conn = mysql.connect()
+        conn = connectPostgres()
+        cursor = conn.cursor(cursor_factory=pe.DictCursor)
+        print('room_id',room_id)
+        cursor.execute(f"SELECT devices_room.id, device_name, device_detail, code, device_id, room_id, is_active, param, devices_room.created_at, devices_room.updated_at, name FROM devices_room, devices WHERE room_id ={room_id} AND devices_room.device_id=devices.id")
         rows = cursor.fetchall()
-        res = jsonify({"deviceRooms": rows})
+        deviceRooms = []
+        for row in rows:
+            deviceRooms.append(dict(row))
+        res = jsonify({"deviceRooms": deviceRooms})
         res.status_code = 200
         return res
     except Exception as e:
-        print(e)
+        res = jsonify({"success":False,
+                       "messages":[e]
+                       })
+        res.status_code = 500
+        return res
     finally:
         cursor.close()
         conn.close()
@@ -42,7 +53,7 @@ def getAllDevices():
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM device")
+        cursor.execute("SELECT * FROM devices")
         rows = cursor.fetchall()
         res = jsonify(rows)
         res.status_code = 200
@@ -69,7 +80,7 @@ def createDevice():
         # validate
         if _name != None and request.method == 'POST':
             # save edited
-            sql = "INSERT INTO device (name, created_at, updated_at) VALUES(%s, %s, %s)"
+            sql = "INSERT INTO devices (name, created_at, updated_at) VALUES(%s, %s, %s)"
             data = (_name, _created, _updated)
             conn = mysql.connect()
             cursor = conn.cursor()
@@ -95,7 +106,7 @@ def findDevice(id):
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM device WHERE id = %s", id)
+        cursor.execute("SELECT * FROM devices WHERE id = %s", id)
         row = cursor.fetchone()
         res = jsonify(row)
         res.status_code = 200
@@ -120,7 +131,7 @@ def updateDevice(id):
         _updated_at = datetime.utcnow()
         if id != None and request.method == 'POST' or 'PUT':
             # update
-            sql = "UPDATE device SET name=%s, updated_at=%s WHERE id=%s"
+            sql = "UPDATE devices SET name=%s, updated_at=%s WHERE id=%s"
             data = (_name, _updated_at, id)
             conn = mysql.connect()
             cursor = conn.cursor()
@@ -146,7 +157,7 @@ def deleteDevices(id):
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM device WHERE id=%s", id)
+        cursor.execute("DELETE FROM devices WHERE id=%s", id)
         conn.commit()
         res = jsonify({"message": "Delete device successfully"})
         res.status_code = 200
@@ -168,7 +179,7 @@ def getDetailDevice(room_id, device_id):
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT device_room.id, code, device_id, room_id, is_active, param, device_room.created_at, device_room.updated_at, name FROM device_room, device WHERE room_id = %s AND device_room.id=%s AND device_room.device_id=device.id", (room_id, device_id))
+        cursor.execute("SELECT devices_room.id, code, device_id, room_id, is_active, param, devices_room.created_at, devices_room.updated_at, name FROM devices_room, devices WHERE room_id = %s AND devices_room.id=%s AND devices_room.device_id=devices.id", (room_id, device_id))
         row = cursor.fetchone()
         res = jsonify(row)
         res.status_code = 200
@@ -190,7 +201,7 @@ def getDeviceOfRoom(room_id):
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT device_room.id, code, device_id, room_id, is_active, param, device_room.created_at, device_room.updated_at, name FROM device_room, device WHERE room_id =%s AND device_room.device_id=device.id", room_id)
+        cursor.execute("SELECT devices_room.id, code, device_id, room_id, is_active, param, devices_room.created_at, devices_room.updated_at, name FROM devices_room, devices WHERE room_id =%s AND devices_room.device_id=devices.id", room_id)
         rows = cursor.fetchall()
         res = jsonify(rows)
         res.status_code = 200

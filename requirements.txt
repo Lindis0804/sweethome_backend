@@ -4,3 +4,4 @@ flask-mysql==1.5.2
 paho-mqtt==1.6.1
 flask-jwt-extended==4.5.2
 flask_swagger_ui==4.11.1
+python-dotenv==1.0.0
