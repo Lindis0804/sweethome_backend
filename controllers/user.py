@@ -8,6 +8,10 @@ from flask import flash, request
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_identity
 
+import psycopg2.extras as pe
+from utils.utils import getErrorResponse
+
+from utils.db import connectPostgres
 # GET detail user
 
 
@@ -18,15 +22,18 @@ def getDetailUsers():
     cursor = None
     current_user = get_jwt_identity()
     try:
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM user WHERE email = %s", current_user)
+        # conn = mysql.connect()
+        # cursor = conn.cursor(pymysql.cursors.DictCursor)
+        conn = connectPostgres()
+        cursor = conn.cursor(cursor_factory=pe.DictCursor)
+        cursor.execute("SELECT email, id, name, phone_number FROM users WHERE email = %s", current_user)
         row = cursor.fetchone()
-        res = jsonify({"user": row})
+        res = jsonify({"user": dict(row)})
         res.status_code = 200
         return res
     except Exception as e:
         print(e)
+        return getErrorResponse(e)
     finally:
         cursor.close()
         conn.close()

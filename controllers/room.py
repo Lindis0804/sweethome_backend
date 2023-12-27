@@ -5,6 +5,9 @@ from flask import jsonify
 from flask import flash, request
 from datetime import datetime
 from flask_jwt_extended import jwt_required
+from utils.utils import getErrorResponse
+from utils.db import connectPostgres
+import psycopg2.extras as pe
 # from flask_jwt_extended import get_jwt_identity
 
 # 1.2 GET /h/house/:house_id/room
@@ -16,15 +19,26 @@ def getHRoomOfHouse(house_id):
     conn = None
     cursor = None
     try:
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM room where house_id=%s", house_id)
+        # conn = mysql.connect()
+        # cursor = conn.cursor(pymysql.cursors.DictCursor)
+        conn = connectPostgres()
+        cursor = conn.cursor(cursor_factory=pe.DictCursor)
+        cursor.execute("SELECT * FROM rooms where house_id=%s", (house_id,))
         rows = cursor.fetchall()
-        res = jsonify({"rooms": rows})
+        
+        rooms = []
+        for row in rows:
+            rooms.append(dict(row))
+            
+        res = jsonify({"rooms": rooms})
         res.status_code = 200
         return res
     except Exception as e:
-        print(e)
+        print("Error")
+        return jsonify({
+            "success":False,
+            "message":[e]
+        })
     finally:
         cursor.close()
         conn.close()
@@ -39,13 +53,14 @@ def getDetailRoom(id):
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM room WHERE id=%s", id)
+        cursor.execute("SELECT * FROM room WHERE id=%s", (id,))
         row = cursor.fetchone()
         res = jsonify(row)
         res.status_code = 200
         return res
     except Exception as e:
         print(e)
+        return getErrorResponse(e)
     finally:
         cursor.close()
         conn.close()
