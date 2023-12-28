@@ -1,4 +1,3 @@
-import pymysql
 import paho.mqtt.client as paho
 import psycopg2.extras as pe
 from app import *
