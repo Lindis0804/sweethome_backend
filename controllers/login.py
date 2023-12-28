@@ -67,7 +67,13 @@ def loginUser():
             else:
                 return jsonify({'message': "Wrong email or password"}), 401
     except Exception as e:
+        res = jsonify({
+            "success":False,
+            "message":[e]
+        })
+        res.status_code = 500
         print(e)
+        return res
     finally:
         cursor.close()
         conn.close()
